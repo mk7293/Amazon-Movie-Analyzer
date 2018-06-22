@@ -5,7 +5,7 @@ public class TermFrequency {
 
 	String[] stopWordsList;
 	ArrayList<String> amazonReviews;
-	Map<String, Integer> termMap;
+	Map<String, Integer> termMap = new HashMap<>(); 
 
 	private void getFileContent(String fileName) {
 		amazonReviews = new ArrayList<>();
@@ -105,7 +105,6 @@ public class TermFrequency {
 	}
 
 	private void indexingTerms() {
-		termMap = new HashMap<>();
 		for (String string : amazonReviews) {
 			String[] terms = string.split(" ");
 			for (String term : terms) {
@@ -120,7 +119,7 @@ public class TermFrequency {
 
 	private void writeText(int count) {
 		try {
-			PrintWriter writer = new PrintWriter("term-frequency-" + count + ".txt", "UTF-8");
+			PrintWriter writer = new PrintWriter("TermFrequenciesDocs\\term-frequency-" + count + "111.txt", "UTF-8");
 			String mm = new String();
 			for (Map.Entry<String, Integer> entry : termMap.entrySet()) {
 				mm += String.format("%-15s", entry.getKey());
@@ -150,9 +149,9 @@ public class TermFrequency {
 				frequency.performTokenization();
 				frequency.removeStopWord();
 				frequency.indexingTerms();
-				frequency.writeText(count++);
 			}
 		}
+		frequency.writeText(count++);
 	}
 
 }

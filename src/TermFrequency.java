@@ -5,7 +5,7 @@ public class TermFrequency {
 
 	String[] stopWordsList;
 	ArrayList<String> amazonReviews;
-	Map<String, Integer> termMap = new HashMap<>(); 
+	Map<String, Integer> termMap = new HashMap<>();
 
 	private void getFileContent(String fileName) {
 		amazonReviews = new ArrayList<>();
@@ -117,9 +117,9 @@ public class TermFrequency {
 		}
 	}
 
-	private void writeText(int count) {
+	private void writeText() {
 		try {
-			PrintWriter writer = new PrintWriter("TermFrequenciesDocs\\term-frequency-" + count + "111.txt", "UTF-8");
+			PrintWriter writer = new PrintWriter("TermFrequenciesDocs\\term-frequencies.txt", "UTF-8");
 			String mm = new String();
 			for (Map.Entry<String, Integer> entry : termMap.entrySet()) {
 				mm += String.format("%-15s", entry.getKey());
@@ -141,7 +141,6 @@ public class TermFrequency {
 		String fileNameDefined = "D:\\KPT\\Movies_and_TV.JSON";
 		File dirFile = new File(fileNameDefined);
 		File[] files = dirFile.listFiles();
-		int count = 0;
 		for (File file : files) {
 			if (file.isFile()) {
 				String eachFilePath = fileNameDefined + "\\" + file.getName();
@@ -151,7 +150,7 @@ public class TermFrequency {
 				frequency.indexingTerms();
 			}
 		}
-		frequency.writeText(count++);
+		frequency.writeText();
 	}
 
 }

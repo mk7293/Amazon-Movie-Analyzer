@@ -11,13 +11,13 @@ import org.json.JSONObject;
 public class JsonToCsv {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		File folder = new File("json");
 		File[] listOfFiles = folder.listFiles();
 		for(int i=0;i<listOfFiles.length;i++)
 		{
 			convertJsonTOCsv("json\\"+listOfFiles[i].getName());
 		}
+	
 	}
 	static void convertJsonTOCsv(String filename){
 		File file=new File(filename+".csv");

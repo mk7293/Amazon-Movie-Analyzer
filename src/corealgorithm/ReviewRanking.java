@@ -1,5 +1,11 @@
 package corealgorithm;
-
+/**
+ * ReviewRanking.java
+ * 
+ * Date: 7/22/2018
+ * 
+ * 
+ */
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -23,17 +29,18 @@ public class ReviewRanking {
 			in = new FileReader(csvFile);
 			for (CSVRecord csv : CSVFormat.EXCEL.parse(in)) {
 				if (i == 0) {
+					i = 1;
 					continue;
 				}
 
-				// TO-DO Figure the column index values
-				String movieId = csv.get(i);
-				String reviewText = csv.get(i);
-				int reviewRating = Integer.parseInt(csv.get(i));
-				String reviewDate = csv.get(i);
-				int sentimentScore = Integer.parseInt(csv.get(i));
+				String movieId = csv.get(4);
+				String reviewText = csv.get(5);
+				int reviewRating = Integer.parseInt(csv.get(3));
+				String reviewDate = csv.get(6);
+				int sentimentScore = Integer.parseInt(csv.get(7));
 
-				ReviewDetails details = new ReviewDetails(reviewText, reviewRating, reviewDate, sentimentScore);
+				ReviewDetails details = new ReviewDetails(reviewText, reviewRating, reviewDate, sentimentScore,
+						movieId);
 
 				if (reviewMap.containsKey(movieId)) {
 					ArrayList<ReviewDetails> list = reviewMap.get(movieId);
@@ -45,7 +52,6 @@ public class ReviewRanking {
 					reviewMap.put(movieId, list);
 				}
 
-				i++;
 			}
 		} catch (FileNotFoundException e) {
 			System.err.println("CSV File Not Found");
@@ -55,23 +61,23 @@ public class ReviewRanking {
 	}
 
 	private void assignReviewScore(ReviewDetails details) throws ParseException {
-		int sentimentScore = details.sentimentScore * 10;
+		int sentimentScore = details.sentimentScore * 7;
 		int ratingScore = details.reviewRating * 8;
 		int dateScore;
-		Date currentDate = new SimpleDateFormat("MM/DD/YYYY").parse(String.valueOf(new Date()));
+		Date currentDate = new SimpleDateFormat("MM/DD/YYYY").parse("07/27/2018");
 
 		@SuppressWarnings("deprecation")
 		long months = (currentDate.getYear() - details.reviewDate.getYear()) * 12
 				+ (currentDate.getMonth() - details.reviewDate.getMonth());
 
 		if (months <= 24) {
-			dateScore = 20;
+			dateScore = 32;
 		} else if (months > 24 && months <= 48) {
-			dateScore = 15;
+			dateScore = 24;
 		} else if (months > 48 && months <= 72) {
-			dateScore = 10;
+			dateScore = 16;
 		} else if (months > 72 && months <= 100) {
-			dateScore = 5;
+			dateScore = 8;
 		} else {
 			dateScore = 0;
 		}
@@ -132,18 +138,25 @@ public class ReviewRanking {
 	}
 
 	public static void main(String[] args) throws ParseException {
-		ReviewRanking ranking = new ReviewRanking("");
-		
-		
-		ArrayList<ArrayList<ReviewDetails>> reviews = ranking.retrieveReviews("");
-		
+		ReviewRanking ranking = new ReviewRanking("OverAll50K.csv");
+
+		ArrayList<ArrayList<ReviewDetails>> reviews = ranking.retrieveReviews("B00005JLYQ");
+
 		try {
 			System.out.println("Positive Reviews are: ");
 			ArrayList<ReviewDetails> detailsList = reviews.get(0);
 			for (ReviewDetails reviewDetails : detailsList) {
-				System.out.println();
+				System.out.println(reviewDetails.movieId + "    ::     " + reviewDetails.reviewText.substring(0, 50)
+						+ " :: " + reviewDetails.reviewRating + "  ::   " + reviewDetails.reviewDate + "  ::  " + reviewDetails.reviewScore);
 			}
-			
+
+			System.out.println("Negative Reviews are: ");
+			ArrayList<ReviewDetails> detailsList1 = reviews.get(1);
+			for (ReviewDetails reviewDetails : detailsList1) {
+				System.out.println(reviewDetails.movieId + "    ::     " + reviewDetails.reviewText.substring(0, 50)
+						+ " :: " + reviewDetails.reviewRating + "  ::   " + reviewDetails.reviewDate + "  ::  "  + reviewDetails.reviewScore);
+			}
+
 		} catch (NullPointerException e) {
 			System.err.println("Movie/TV not Found!");
 		}
@@ -157,12 +170,14 @@ class ReviewDetails {
 	Date reviewDate;
 	double reviewScore;
 	int sentimentScore;
+	String movieId;
 
-	public ReviewDetails(String reviewText, int reviewRating, String date, int sentimentScore) {
+	public ReviewDetails(String reviewText, int reviewRating, String date, int sentimentScore, String movieId) {
 		this.reviewText = reviewText;
 		this.reviewRating = reviewRating;
 		this.reviewScore = 0.0;
 		this.sentimentScore = sentimentScore;
+		this.movieId = movieId;
 		try {
 			this.reviewDate = (Date) new SimpleDateFormat("mm dd,yyyy").parse(date);
 		} catch (ParseException e) {

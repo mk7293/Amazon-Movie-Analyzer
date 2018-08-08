@@ -16,6 +16,7 @@ public class AmazonMovieSentimentAnalysis {
 	String trainingDocs[], testingDocs[];
 	int trainingLabels[], testingLabels[], predictTestingLabel[];
 	int correctCount = 0;
+	int correctCountN = 0;
 
 	int numClasses = 2;
 	int[] classCounts; // number of docs per class
@@ -24,6 +25,7 @@ public class AmazonMovieSentimentAnalysis {
 	HashMap<String, Double>[] condProb;
 	HashSet<String> vocabulary; // entire vocabulary
 	Map<String, Integer> termFrequency = new HashMap<>();
+	int threshold;
 
 	@SuppressWarnings("unchecked")
 	public AmazonMovieSentimentAnalysis(String trainCSVFile) throws IOException {
@@ -51,14 +53,22 @@ public class AmazonMovieSentimentAnalysis {
 			// Get all the proper cloumn values
 			String reviewText = csv.get(5);
 			String summary = csv.get(0);
+			String words = csv.get(9);
 
 			// Do all the preprocees in words
-			reviewText = preProcessing.performTokenization(reviewText + " " + summary);
+			reviewText = preProcessing.performTokenization(reviewText + " " + summary + " " + words);
 			reviewText = preProcessing.doStem(reviewText);
+//			preProcessing.termFreq(reviewText);
 
 			reviewList.add(reviewText);
 			classLabel.add(Integer.parseInt(csv.get(8)));
 		}
+
+		/*for (int i = 0; i < reviewList.size(); i++) {
+			String text = reviewList.get(i);
+			text = preProcessing.getTerms(text);
+			reviewList.set(i, text);
+		}*/
 
 		int length = reviewList.size();
 		trainingDocs = new String[length];
@@ -126,9 +136,6 @@ public class AmazonMovieSentimentAnalysis {
 		int vSize = vocabulary.size();
 		Double[] score = new Double[numClasses];
 
-		reviewText = preProcessing.performTokenization(reviewText);
-		reviewText = preProcessing.doStem(reviewText);
-
 		for (int i = 0; i < score.length; i++) {
 			score[i] = Math.log(classCounts[i] * 1.0 / trainingDocs.length);
 		}
@@ -159,7 +166,7 @@ public class AmazonMovieSentimentAnalysis {
 	private void classifyAll(String testCSVFile) throws IOException {
 		long startTime = System.currentTimeMillis();
 		System.out.println("Vocabulary Size: " + vocabulary.size());
-
+		preProcessing = new TextPreProcessing();
 		ArrayList<Integer> testClassLabel = new ArrayList<>();
 		ArrayList<String> testReviewList = new ArrayList<>();
 
@@ -175,9 +182,19 @@ public class AmazonMovieSentimentAnalysis {
 			String reviewText = csv.get(5);
 			String summary = csv.get(0);
 
-			testReviewList.add(reviewText + " " + summary);
+			reviewText = preProcessing.performTokenization(reviewText + " " + summary);
+			reviewText = preProcessing.doStem(reviewText);
+//			preProcessing.termFreq(reviewText);
+
+			testReviewList.add(reviewText);
 			testClassLabel.add(Integer.parseInt(csv.get(8)));
 		}
+
+		/*for (int i = 0; i < testReviewList.size(); i++) {
+			String testText = testReviewList.get(i);
+			testText = preProcessing.getTerms(testText);
+			testReviewList.set(i, testText);
+		}*/
 
 		int length = testReviewList.size();
 		testingDocs = new String[length];
@@ -191,7 +208,7 @@ public class AmazonMovieSentimentAnalysis {
 		}
 
 		System.out.println("Correctly classified " + correctCount + " out of " + length);
-		System.out.println("Accuracy: " + (double) (correctCount * 1.0 / length * 1.0) * 100);
+		System.out.println("Accuracy: " + (double) ((correctCount) * 1.0 / length * 1.0) * 100);
 
 		long endTime = System.currentTimeMillis();
 		System.out.println("Time taken to test the model: "
@@ -209,10 +226,13 @@ public class AmazonMovieSentimentAnalysis {
 		System.out.println();
 		System.out.println("Sample Single Reviews to check::");
 		System.out.println("One of the best movie: " + analysis.classify("One of the best movie"));
-		System.out.println("Movie is not worth compare to other movies: " + analysis.classify("Movie is not worth compare to other movies"));
-		System.out.println("This movie is generic and extremely bad: " + analysis.classify("This movie is generic and extremely bad"));
-		System.out.println("The movie has fantastic plot and amazing direction: " + analysis.classify("The movie has fantastic plot and amazing direction"));
-		System.out.println("Awesome Movie: " + analysis.classify("Awesome Movie"));
+		System.out.println("Movie is not worth compare to other movies: "
+				+ analysis.classify("Movie is not worth compare to other movies"));
+		System.out.println("This movie is generic and extremely bad: "
+				+ analysis.classify("This movie is generic and extremely bad"));
+		System.out.println("The movie has fantastic plot and amazing direction: "
+				+ analysis.classify("The movie has fantastic plot and amazing direction"));
+		System.out.println("Great Movie: " + analysis.classify("Great Movie"));
 	}
 
 }

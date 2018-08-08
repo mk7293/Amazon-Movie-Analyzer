@@ -3,20 +3,27 @@ package corealgorithm;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
 public class TextPreProcessing {
 
 	public static final String CURR_PATH = System.getProperty("user.dir");
+	int threshold;
+	
+	public TextPreProcessing() {
+	}
 
 	public String performTokenization(String text) {
 		String[] tokens = text.split("\\W+");
 		String tokenizedText = "";
 		for (String token : tokens) {
+//			token = token.replaceAll("\\d","");
 			tokenizedText += token.toLowerCase() + " ";
 		}
 		return tokenizedText;
 	}
 
-	private ArrayList<String> getStopWords() {
+	/*private ArrayList<String> getStopWords() {
 		String stopWordPath = CURR_PATH + "//" + "stopwords.txt";
 		ArrayList<String> list = new ArrayList<>();
 		try {
@@ -36,7 +43,7 @@ public class TextPreProcessing {
 		return list;
 
 	}
-	
+
 	private int searchStopWord(String term, ArrayList<String> stopWordList) {
 		int lo = 0, hi = stopWordList.size() - 1;
 
@@ -65,7 +72,7 @@ public class TextPreProcessing {
 		}
 		return newText;
 	}
-	
+*/
 	public String doStem(String text) {
 		String[] terms = text.split(" ");
 		String newTerms = "";
@@ -80,5 +87,32 @@ public class TextPreProcessing {
 		}
 		return newTerms;
 	}
+
+	/*public void termFreq(String text) {
+		String[] terms = text.split(" ");
+		for (String term : terms) {
+			if (!termMap.containsKey(term)) {
+				termMap.put(term, new Integer(1));
+			} else {
+				int value = termMap.get(term);
+				termMap.put(term, new Integer(value + 1));
+			}
+		}
+	}
+	
+	
+	
+	public String getTerms(String reviewText) {
+		
+		String text = "";
+		String terms[] = reviewText.split(" ");
+		for (String term : terms) {
+			int value = termMap.get(term);
+			if (value > threshold) {
+				text += term + " ";
+			}
+		}
+		return text;
+	}*/
 
 }
